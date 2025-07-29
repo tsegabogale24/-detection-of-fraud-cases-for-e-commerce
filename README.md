@@ -1,176 +1,153 @@
-🕵️‍ Fraud Detection for E-Commerce and Credit Card Transactions
+# 🕵️‍♂️ E-Commerce & Credit Card Fraud Detection
 
-🚀 Project Overview
+This project is an end-to-end machine learning pipeline designed to detect fraudulent transactions using two datasets: a synthetic **e-commerce fraud dataset** and a real-world **credit card fraud dataset** from Kaggle. We built, evaluated, and interpreted models with modern explainability tools like SHAP to uncover patterns in fraud behavior.
 
-This project focuses on detecting fraudulent transactions using machine learning. It analyzes both e-commerce and credit card transaction datasets, applies advanced feature engineering, builds multiple models including XGBoost and Logistic Regression, and uses SHAP for interpretability.
+---
 
-We aim to help financial and e-commerce platforms proactively identify suspicious activity by building models that generalize across different fraud types.
+## 📊 Datasets Used
 
-📁 Project Structure
+### 1. `Fraud_Data.csv` (E-Commerce Fraud Dataset)
+- Includes user-level transaction metadata like:
+  - `purchase_time`, `signup_time`
+  - User attributes: `browser`, `sex`, `source`, `age`, `device_id`
+  - IP-related features
+  - Target: `fraud` (1 = fraud, 0 = legit)
 
-fraud-detection-project/
+### 2. `IpAddress_to_Country.csv`
+- Maps user IPs to countries for geolocation-based features.
+
+### 3. `creditcard.csv`
+- Standard dataset for credit card fraud detection from Kaggle.
+- 284,807 transactions with 492 fraud cases (high class imbalance).
+
+---
+
+## 🛠️ Feature Engineering
+
+### ✅ For Both Datasets:
+- **Time-based features**:
+  - `hour_of_day`, `day_of_week`
+  - `time_since_signup` (e-commerce)
+- **Categorical encoding**:
+  - Label encoding: `source`, `browser`, `sex`
+- **Dropped high-cardinality ID columns**:
+  - `device_id`, `user_id`
+- **Geolocation (E-Commerce only)**:
+  - Country derived from IP-to-country mapping.
+
+---
+
+## 🤖 Models Trained
+
+We applied both simple and advanced models with proper handling of class imbalance.
+
+| Dataset | Models | Resampling | Evaluation |
+|--------|--------|------------|------------|
+| **E-Commerce** | Logistic Regression, Random Forest, XGBoost | SMOTE | ROC-AUC, Confusion Matrix |
+| **Credit Card** | Logistic Regression, Random Forest, XGBoost | None (already imbalanced) | ROC-AUC, F1, Precision, Recall |
+
+---
+
+## 🔍 Model Interpretability with SHAP
+
+### ✅ SHAP Visualizations (Global + Local):
+We used **SHAP** (SHapley Additive exPlanations) to interpret both XGBoost and Logistic Regression models.
+
+#### 📈 SHAP Summary Plots
+- Highlight top features driving fraud predictions.
+- In e-commerce data, `time_since_signup`, `hour_of_day`, and `country` were strong indicators.
+- In credit card data, anonymized features like `V14`, `V10`, and `V17` were most important.
+
+#### 🎯 SHAP Force Plots
+- Explained **individual predictions** for specific transactions.
+- Great for model transparency and trust.
+
+All SHAP plots are saved in `reports/figures`.
+
+---
+
+## 📁 Project Structure
+
 ├── data/
-│   ├── raw/                     # Original datasets
-│   ├── processed/               # Cleaned & transformed CSVs
+│ ├── raw/
+│ ├── processed/
+│ └── external/
 ├── notebooks/
-│   ├── EDA_and_Preprocessing.ipynb
-│   ├── Model_Training.ipynb
-│   ├── SHAP_Interpretation.ipynb
-├── models/                     # Trained models (.pkl)
-├── reports/
-│   └── figures/                 # SHAP plots, metric visualizations
+│ ├── EDA_and_Preprocessing.ipynb
+│ ├── Model_Training.ipynb
+│ └── SHAP_Interpretation.ipynb
 ├── src/
-│   ├── transform_preprocessing.py
-│   ├── model_training.py
-│   ├── shap_interpretation.py
-├── requirements.txt
-└── README.md
+│ ├── transform_preprocessing.py
+│ ├── train_models.py
+│ ├── shap_interpretation.py
+├── reports/
+│ └── figures/ ← SHAP plots, confusion matrices, etc.
+├── models/
+│ └── *.pkl (saved models)
+├── README.md
+└── requirements.txt
 
-📦 Datasets Used
 
-1. Fraud_Data.csv
 
-Contains transaction metadata for an e-commerce site
+---
 
-Key features: signup_time, purchase_time, device_id, browser, source, fraud
+## 🧪 How to Run
 
-2. IpAddress_to_Country.csv
-
-Maps numeric IP ranges to countries
-
-Used to enrich the e-commerce dataset with geolocation info
-
-3. creditcard.csv
-
-Popular credit card fraud detection dataset
-
-284,807 transactions with severe class imbalance
-
-🧱 Feature Engineering
-
-✅ Common Features
-
-Datetime Processing:
-
-Extracted hour_of_day, day_of_week from purchase_time
-
-Computed time_since_signup in hours
-
-Categorical Encoding:
-
-Label encoding for browser, source, sex
-
-Dropped device_id due to high cardinality
-
-Transaction Frequency Features (for e-commerce):
-
-User-level transaction counts
-
-Average time between purchases
-
-🧠 Models Trained
-
-Dataset
-
-Model
-
-Sampling
-
-ROC-AUC
-
-Precision
-
-Recall
-
-Credit Card
-
-XGBoost
-
-SMOTE
-
-0.985
-
-0.93
-
-0.89
-
-Credit Card
-
-Logistic Regression
-
-None
-
-0.973
-
-0.91
-
-0.86
-
-E-Commerce
-
-XGBoost
-
-ADASYN
-
-0.94
-
-0.89
-
-0.87
-
-E-Commerce
-
-Logistic Regression
-
-None
-
-0.91
-
-0.86
-
-0.85
-
-📈 Model Interpretability with SHAP
-
-We applied SHAP to interpret model decisions:
-
-SHAP Summary Plot: Global feature importance
-
-SHAP Force Plot: Local explanation for individual predictions
-
-📂 Visualizations stored in reports/figures/
-
-shap_summary_xgb_creditcard.png
-shap_force_xgb_creditcard.png
-shap_summary_logreg_ecommerce.png
-shap_force_logreg_ecommerce.png
-
-▶️ How to Run
-
-1. Clone the repository
-
-git clone https://github.com/tsegabogale24/-detection-of-fraud-cases-for-e-commerce.git
-cd -detection-of-fraud-cases-for-e-commerce
-
-2. Set up environment
+### 1. Clone the repo
+```
+git clone https://github.com/your-username/detection-of-fraud-cases-for-e-commerce.git
+cd detection-of-fraud-cases-for-e-commerce
+2. Create and activate virtual environment
 
 python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+source .venv/Scripts/activate  # On Linux: source .venv/bin/activate
+3. Install dependencies
+
 pip install -r requirements.txt
+4. Run Notebooks or Scripts
+All code is modularized and runnable from notebooks/ or by importing from src/.
 
-3. Run data processing and modeling
+📊 Evaluation Metrics
+Metric	Description
+ROC-AUC	Measures discrimination power between classes
+F1-Score	Balance between precision and recall
+Precision	True Positives / (True Positives + False Positives)
+Recall	True Positives / (True Positives + False Negatives)
 
-python src/transform_preprocessing.py
-python src/model_training.py
+📝 Final Report
+A detailed Medium-style report is available in the reports/ folder or hosted online.
 
-4. Explore with Jupyter
+It covers:
 
-jupyter notebook notebooks/EDA_and_Preprocessing.ipynb
+Problem background
 
-📄 Final Report
+Dataset description
 
-You can read the full project article with background, methodology, SHAP analysis, and outcomes here (replace with actual link)
+Feature engineering
 
-👨‍💻 Contributors
+Model comparisons
 
+SHAP explainability
+
+Recommendations
+
+💡 Key Takeaways
+XGBoost consistently outperformed Logistic Regression and Random Forest.
+
+SHAP was critical for uncovering the most important fraud indicators.
+
+Class imbalance was successfully handled using SMOTE and evaluation metrics beyond accuracy.
+
+The pipeline is modular and can be extended to real-world production settings.
+
+🙌 Acknowledgements
+Kaggle for the credit card fraud dataset.
+
+The creators of the synthetic e-commerce fraud dataset.
+
+SHAP by Scott Lundberg.
+
+📧 Contact
 Tsega Bogale
+GitHub: @tsegabogale24
+Email: tsegabogale24@gmail.com
