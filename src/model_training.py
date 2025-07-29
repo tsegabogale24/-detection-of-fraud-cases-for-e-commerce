@@ -1,6 +1,5 @@
-# train_fraud_and_credit.py
-
 import pandas as pd
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, average_precision_score
@@ -54,8 +53,10 @@ def run_credit_pipeline():
     X_train, X_test = scale_features(X_train, X_test)
     X_train, y_train = balance_data(X_train, y_train)
     models = train_models(X_train, y_train)
-    for model in models.values():
+    
+    for name, model in models.items():
         evaluate_model(model, X_test, y_test, "CreditCard")
+        joblib.dump(model, f"../models/{name.lower()}_creditcard_fraud.pkl")
 
 def run_fraud_pipeline():
     X_train, X_test, y_train, y_test = load_fraud_data(
@@ -65,8 +66,10 @@ def run_fraud_pipeline():
     X_train, X_test = scale_features(X_train, X_test)
     X_train, y_train = balance_data(X_train, y_train)
     models = train_models(X_train, y_train)
-    for model in models.values():
+    
+    for name, model in models.items():
         evaluate_model(model, X_test, y_test, "E-Commerce Fraud")
+        joblib.dump(model, f"../models/{name.lower()}_ecommerce_fraud.pkl")
 
 if __name__ == "__main__":
     run_credit_pipeline()
